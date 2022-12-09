@@ -76,4 +76,10 @@ class LinkPredictionDataset(Dataset):
 
 
 class GraphClassificationDataset(Dataset):
-    pass
+    def __init__(self, output_directory, spark):
+        super().__init__(output_directory, spark)
+
+        self.train_nodes_file = output_directory / Path(PathConstants.train_nodes_path)
+        self.valid_nodes_file = output_directory / Path(PathConstants.valid_nodes_path)
+        self.test_nodes_file = output_directory / Path(PathConstants.test_nodes_path)
+        self.graph_labels_file = output_directory / Path(PathConstants.labels_path)
