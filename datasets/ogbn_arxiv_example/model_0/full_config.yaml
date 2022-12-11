@@ -1,0 +1,224 @@
+model:
+  random_seed: 5706028024585735203
+  learning_task: NODE_CLASSIFICATION
+  encoder:
+    layers:
+    - - type: FEATURE
+        options: {}
+        input_dim: -1
+        output_dim: 128
+        init:
+          type: GLOROT_UNIFORM
+          options: {}
+        optimizer:
+          type: DEFAULT
+          options:
+            learning_rate: 0.1
+            eps: 1.0e-10
+            init_value: 0.0
+            lr_decay: 0.0
+            weight_decay: 0.0
+        bias: true
+        bias_init:
+          type: ZEROS
+          options: {}
+        activation: NONE
+    - - type: GNN
+        options:
+          type: GRAPH_SAGE
+          aggregator: MEAN
+        input_dim: 128
+        output_dim: 128
+        init:
+          type: GLOROT_UNIFORM
+          options: {}
+        optimizer:
+          type: DEFAULT
+          options:
+            learning_rate: 0.1
+            eps: 1.0e-10
+            init_value: 0.0
+            lr_decay: 0.0
+            weight_decay: 0.0
+        bias: true
+        bias_init:
+          type: ZEROS
+          options: {}
+        activation: NONE
+    - - type: GNN
+        options:
+          type: GRAPH_SAGE
+          aggregator: MEAN
+        input_dim: 128
+        output_dim: 128
+        init:
+          type: GLOROT_UNIFORM
+          options: {}
+        optimizer:
+          type: DEFAULT
+          options:
+            learning_rate: 0.1
+            eps: 1.0e-10
+            init_value: 0.0
+            lr_decay: 0.0
+            weight_decay: 0.0
+        bias: true
+        bias_init:
+          type: ZEROS
+          options: {}
+        activation: NONE
+    - - type: GNN
+        options:
+          type: GRAPH_SAGE
+          aggregator: MEAN
+        input_dim: 128
+        output_dim: 40
+        init:
+          type: GLOROT_UNIFORM
+          options: {}
+        optimizer:
+          type: DEFAULT
+          options:
+            learning_rate: 0.1
+            eps: 1.0e-10
+            init_value: 0.0
+            lr_decay: 0.0
+            weight_decay: 0.0
+        bias: true
+        bias_init:
+          type: ZEROS
+          options: {}
+        activation: NONE
+    train_neighbor_sampling:
+    - type: ALL
+      options: {}
+      use_incoming_nbrs: true
+      use_outgoing_nbrs: true
+      use_hashmap_sets: true
+    - type: ALL
+      options: {}
+      use_incoming_nbrs: true
+      use_outgoing_nbrs: true
+      use_hashmap_sets: true
+    - type: ALL
+      options: {}
+      use_incoming_nbrs: true
+      use_outgoing_nbrs: true
+      use_hashmap_sets: true
+    eval_neighbor_sampling: []
+    embedding_dim: -1
+  decoder:
+    type: NODE
+    options: {}
+    optimizer:
+      type: ADAGRAD
+      options:
+        learning_rate: 0.1
+        eps: 1.0e-10
+        init_value: 0.0
+        lr_decay: 0.0
+        weight_decay: 0.0
+  loss:
+    type: CROSS_ENTROPY
+    options:
+      reduction: SUM
+  dense_optimizer:
+    type: ADAM
+    options:
+      learning_rate: 0.01
+      amsgrad: false
+      beta_1: 0.9
+      beta_2: 0.999
+      eps: 1.0e-08
+      weight_decay: 0.0
+  sparse_optimizer:
+    type: ADAGRAD
+    options:
+      learning_rate: 0.1
+      eps: 1.0e-10
+      init_value: 0.0
+      lr_decay: 0.0
+      weight_decay: 0.0
+storage:
+  device_type: cuda
+  device_ids: []
+  dataset:
+    dataset_dir: /marius/datasets/ogbn_arxiv_example/
+    num_edges: 1166243
+    num_nodes: 169343
+    num_relations: 1
+    num_train: 90941
+    num_valid: 29799
+    num_test: 48603
+    node_feature_dim: 128
+    rel_feature_dim: -1
+    num_classes: 40
+    initialized: false
+  edges:
+    type: DEVICE_MEMORY
+    options:
+      dtype: int
+  nodes:
+    type: DEVICE_MEMORY
+    options:
+      dtype: int
+  embeddings:
+    type: DEVICE_MEMORY
+    options:
+      dtype: float
+  features:
+    type: DEVICE_MEMORY
+    options:
+      dtype: float
+  prefetch: true
+  shuffle_input: true
+  full_graph_evaluation: true
+  export_encoded_nodes: false
+  model_dir: /marius/datasets/ogbn_arxiv_example/model_0/
+  log_level: info
+training:
+  batch_size: 1000
+  negative_sampling: ???
+  num_epochs: 10
+  pipeline:
+    sync: true
+    gpu_sync_interval: 16
+    gpu_model_average: true
+    staleness_bound: 16
+    batch_host_queue_size: 4
+    batch_device_queue_size: 4
+    gradients_device_queue_size: 4
+    gradients_host_queue_size: 4
+    batch_loader_threads: 4
+    batch_transfer_threads: 2
+    compute_threads: 1
+    gradient_transfer_threads: 2
+    gradient_update_threads: 4
+  epochs_per_shuffle: 1
+  logs_per_epoch: 10
+  save_model: true
+  checkpoint:
+    save_best: false
+    interval: -1
+    save_state: false
+  resume_training: false
+  resume_from_checkpoint: ''
+evaluation:
+  batch_size: 1000
+  negative_sampling: ???
+  pipeline:
+    sync: true
+    gpu_sync_interval: 16
+    gpu_model_average: true
+    staleness_bound: 16
+    batch_host_queue_size: 4
+    batch_device_queue_size: 4
+    gradients_device_queue_size: 4
+    gradients_host_queue_size: 4
+    batch_loader_threads: 4
+    batch_transfer_threads: 2
+    compute_threads: 1
+    gradient_transfer_threads: 2
+    gradient_update_threads: 4
+  epochs_per_eval: 1
+  checkpoint_dir: ''

@@ -9,6 +9,8 @@ LearningTask getLearningTask(std::string string_val) {
 
     if (string_val == "NODE_CLASSIFICATION" || string_val == "NC") {
         return LearningTask::NODE_CLASSIFICATION;
+    } else if (string_val == "GRAPH_CLASSIFICATION" || string_val == "GC") {
+        return LearningTask::GRAPH_CLASSIFICATION;
     } else if (string_val == "LINK_PREDICTION" || string_val == "LP") {
         return LearningTask::LINK_PREDICTION;
     } else {

@@ -31,6 +31,9 @@ std::tuple<shared_ptr<Storage>, shared_ptr<Storage>, shared_ptr<Storage>> initia
         num_test = storage_config->dataset->num_test;
     } else if (learning_task == LearningTask::NODE_CLASSIFICATION) {
         num_train = storage_config->dataset->num_edges;
+    } else if (learning_task == LearningTask::GRAPH_CLASSIFICATION) {
+        // TODO: Keeping this same as node classification for now
+        num_train = storage_config->dataset->num_edges;
     }
 
     torch::Dtype dtype = storage_config->edges->options->dtype;
@@ -420,6 +423,9 @@ shared_ptr<GraphModelStorage> initializeStorage(shared_ptr<Model> model, shared_
     if (model->learning_task_ == LearningTask::LINK_PREDICTION) {
         return initializeStorageLinkPrediction(model, storage_config, reinitialize, train, init_config);
     } else if (model->learning_task_ == LearningTask::NODE_CLASSIFICATION) {
+        return initializeStorageNodeClassification(model, storage_config, reinitialize, train, init_config);
+    } else if (model->learning_task_ == LearningTask::GRAPH_CLASSIFICATION) {
+        // TODO: Keeping same as node classification for now
         return initializeStorageNodeClassification(model, storage_config, reinitialize, train, init_config);
     } else {
         SPDLOG_ERROR("Unsupported Learning Task");

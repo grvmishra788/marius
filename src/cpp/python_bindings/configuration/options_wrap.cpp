@@ -4,6 +4,7 @@
 void init_options(py::module &m) {
     py::enum_<LearningTask>(m, "LearningTask")
         .value("NODE_CLASSIFICATION", LearningTask::NODE_CLASSIFICATION)
+        .value("GRAPH_CLASSIFICATION", LearningTask::GRAPH_CLASSIFICATION)
         .value("LINK_PREDICTION", LearningTask::LINK_PREDICTION)
         .value("ENCODE", LearningTask::ENCODE);
 

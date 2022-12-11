@@ -9,7 +9,7 @@
 #include "reporting/logger.h"
 
 // ENUM values
-enum class LearningTask { NODE_CLASSIFICATION, LINK_PREDICTION, ENCODE };
+enum class LearningTask { NODE_CLASSIFICATION, LINK_PREDICTION, ENCODE, GRAPH_CLASSIFICATION };
 
 LearningTask getLearningTask(std::string string_val);
 

@@ -1,0 +1,11 @@
+dataset_dir: /marius/datasets/ogbg_molhiv/
+num_edges: 1129688
+num_nodes: 41127
+num_relations: 1
+num_train: 32901
+num_valid: 4113
+num_test: 4113
+node_feature_dim: 9
+rel_feature_dim: -1
+num_classes: 40
+initialized: false

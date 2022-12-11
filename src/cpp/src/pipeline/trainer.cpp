@@ -21,6 +21,10 @@ PipelineTrainer::PipelineTrainer(shared_ptr<DataLoader> dataloader, shared_ptr<M
     } else if (learning_task_ == LearningTask::NODE_CLASSIFICATION) {
         item_name = "Nodes";
         num_items = dataloader_->graph_storage_->storage_ptrs_.train_nodes->getDim0();
+    } else if (learning_task_ == LearningTask::NODE_CLASSIFICATION) {
+        // TODO: Keeping this same as node classification for now
+        item_name = "Nodes";
+        num_items = dataloader_->graph_storage_->storage_ptrs_.train_nodes->getDim0();
     }
 
     progress_reporter_ = std::make_shared<ProgressReporter>(item_name, num_items, logs_per_epoch);
@@ -64,6 +68,10 @@ void PipelineTrainer::train(int num_epochs) {
         } else if (learning_task_ == LearningTask::NODE_CLASSIFICATION) {
             item_name = "Nodes";
             num_items = dataloader_->graph_storage_->storage_ptrs_.train_nodes->getDim0();
+        } else if (learning_task_ == LearningTask::GRAPH_CLASSIFICATION) {
+            // TODO: Keeping this same as node classification for now
+            item_name = "Nodes";
+            num_items = dataloader_->graph_storage_->storage_ptrs_.train_nodes->getDim0();
         }
 
         int64_t epoch_time = timer.getDuration();
@@ -84,6 +92,10 @@ SynchronousTrainer::SynchronousTrainer(shared_ptr<DataLoader> dataloader, shared
         item_name = "Edges";
         num_items = dataloader_->graph_storage_->storage_ptrs_.train_edges->getDim0();
     } else if (learning_task_ == LearningTask::NODE_CLASSIFICATION) {
+        item_name = "Nodes";
+        num_items = dataloader_->graph_storage_->storage_ptrs_.train_nodes->getDim0();
+    } else if (learning_task_ == LearningTask::GRAPH_CLASSIFICATION) {
+        // TODO: Keeping this same as node classification for now
         item_name = "Nodes";
         num_items = dataloader_->graph_storage_->storage_ptrs_.train_nodes->getDim0();
     }
@@ -155,6 +167,10 @@ void SynchronousTrainer::train(int num_epochs) {
             item_name = "Edges";
             num_items = dataloader_->graph_storage_->storage_ptrs_.train_edges->getDim0();
         } else if (learning_task_ == LearningTask::NODE_CLASSIFICATION) {
+            item_name = "Nodes";
+            num_items = dataloader_->graph_storage_->storage_ptrs_.train_nodes->getDim0();
+        } else if (learning_task_ == LearningTask::GRAPH_CLASSIFICATION) {
+            // TODO: Keeping this same as node classification for now
             item_name = "Nodes";
             num_items = dataloader_->graph_storage_->storage_ptrs_.train_nodes->getDim0();
         }

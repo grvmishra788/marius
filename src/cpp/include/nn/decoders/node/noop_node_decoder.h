@@ -15,5 +15,5 @@ class NoOpNodeDecoder : public NodeDecoder, public torch::nn::Cloneable<NoOpNode
 
     void reset() override;
 };
-
+// TODO: Need to check for Graph Classification
 #endif  // MARIUS_NOOP_NODE_DECODER_H

@@ -39,6 +39,10 @@ Model::Model(shared_ptr<GeneralEncoder> encoder, shared_ptr<Decoder> decoder, sh
         } else if (learning_task_ == LearningTask::NODE_CLASSIFICATION) {
             reporter_ = std::make_shared<NodeClassificationReporter>();
             reporter_->addMetric(std::make_shared<CategoricalAccuracyMetric>());
+        } else if (learning_task_ == LearningTask::GRAPH_CLASSIFICATION) {
+            // TODO: Keeping same as node classification for now
+            reporter_ = std::make_shared<NodeClassificationReporter>();
+            reporter_->addMetric(std::make_shared<CategoricalAccuracyMetric>());
         } else {
             throw MariusRuntimeException("Reporter must be specified for this learning task.");
         }
@@ -317,6 +321,21 @@ void Model::train_batch(shared_ptr<Batch> batch, bool call_step) {
     } else if (learning_task_ == LearningTask::NODE_CLASSIFICATION) {
         torch::Tensor y_pred = forward_nc(batch->node_embeddings_, batch->node_features_, batch->dense_graph_, true);
         loss = (*loss_function_)(y_pred, batch->node_labels_.to(torch::kInt64), false);
+    } else if (learning_task_ == LearningTask::GRAPH_CLASSIFICATION) {
+        // TODO: Keeping same as node classification for now
+        std::cout << "node_embeddings Tensor size: " << batch->node_embeddings_.sizes() << std::endl;
+        std::cout << "node_features Tensor size: " << batch->node_features_.sizes() << std::endl;
+        // std::cout << "dense_graph Tensor size: " << batch->dense_graph_.sizes() << std::endl;
+        std::cout << "node_labels Tensor size: " << batch->node_labels_.sizes() << std::endl;
+        std::cout << "Node ids Tensor size: " << batch->node_ids_.sizes() << std::endl;
+        std::cout << "Node ids Tensor: " << batch->node_ids_ << std::endl;
+        std::cout << "Node labels Tensor: " << batch->node_labels_ << std::endl;
+        std::cout << "Node features Tensor: " << batch->node_features_ << std::endl;
+        std::cout << "Node embeddings Tensor: " << batch->node_embeddings_ << std::endl;
+
+
+        torch::Tensor y_pred = forward_nr(batch->node_embeddings_, batch->node_features_, batch->dense_graph_, true);
+        loss = (*loss_function_)(y_pred, batch->node_labels_, false);
     } else {
         throw MariusRuntimeException("Unsupported learning task for training");
     }
@@ -348,6 +367,13 @@ void Model::evaluate_batch(shared_ptr<Batch> batch) {
             std::dynamic_pointer_cast<LinkPredictionReporter>(reporter_)->addResult(inv_pos_scores, inv_neg_scores);
         }
     } else if (learning_task_ == LearningTask::NODE_CLASSIFICATION) {
+        torch::Tensor y_pred = forward_nc(batch->node_embeddings_, batch->node_features_, batch->dense_graph_, true);
+        torch::Tensor labels = batch->node_labels_;
+
+        std::dynamic_pointer_cast<NodeClassificationReporter>(reporter_)->addResult(labels, y_pred);
+
+    } else if (learning_task_ == LearningTask::GRAPH_CLASSIFICATION) {
+        // TODO: Keeping same as node classification for now
         torch::Tensor y_pred = forward_nc(batch->node_embeddings_, batch->node_features_, batch->dense_graph_, true);
         torch::Tensor labels = batch->node_labels_;
 

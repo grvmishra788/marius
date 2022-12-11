@@ -66,6 +66,7 @@ std::tuple<std::shared_ptr<Model>, shared_ptr<GraphModelStorage>, CheckpointMeta
     } else {
         model->learning_task_ = LearningTask::NODE_CLASSIFICATION;
     }
+    // TODO: Need to check for Graph Classification
 
     shared_ptr<GraphModelStorage> storage = initializeStorage(model, marius_config->storage, false, train);
 
