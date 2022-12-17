@@ -6,10 +6,14 @@ import ipdb
 from marius.tools.configuration.constants import PathConstants
 from marius.tools.preprocess.converters.torch_converter import TorchEdgeListConverter
 import sys
+sys.path.append('/marius/src/python/')
+from helper_utils import *
+sys.path.append('/marius/src/python/tools/preprocess/converters/')
+from torch_converter import TorchEdgeListConverter
 # sys.path is a list of absolute path strings
-sys.path.append('/marius/src/python/tools/preprocess/')
-from dataset import GraphClassificationDataset
-# from marius.tools.preprocess.dataset import GraphClassificationDataset
+# sys.path.append('/marius/src/python/tools/preprocess/')
+# from dataset import GraphClassificationDataset
+from marius.tools.preprocess.dataset import GraphClassificationDataset
 from marius.tools.preprocess.datasets.dataset_helpers import remap_nodes
 from marius.tools.preprocess.utils import download_url, extract_file
 
@@ -83,12 +87,29 @@ class OGBG_MOLHIV(GraphClassificationDataset):
             for file in (self.output_directory / Path("hiv/split/scaffold")).iterdir():
                 file.rename(self.output_directory / Path(file.name))
 
+            update_edges(self.input_edge_list_file, self.input_num_edges_file)
+
     def preprocess(
         self, num_partitions=1, remap_ids=True, splits=None, sequential_train_nodes=False, partitioned_eval=False
     ):
+
+        # replicate graph labels by number of nodes present in num-node-list.csv  & update graph-label.csv
+        gl = np.genfromtxt(self.input_graph_labels_file, delimiter=",").astype(np.int32)
+        if gl.shape[0] != 1049163:
+            num_nodes_g = np.genfromtxt(self.input_num_nodes_file, delimiter=",").astype(np.int32)
+            gl = np.repeat(gl, num_nodes_g).astype(np.int32)
+            np.savetxt(self.input_graph_labels_file, gl, delimiter=",")
+            # print(gl.shape)
+
+
         train_nodes = np.genfromtxt(self.input_train_nodes_file, delimiter=",").astype(np.int32)
         valid_nodes = np.genfromtxt(self.input_valid_nodes_file, delimiter=",").astype(np.int32)
         test_nodes = np.genfromtxt(self.input_test_nodes_file, delimiter=",").astype(np.int32)
+        # get updated train, valid, test nodes
+        train_nodes = get_updated_nodes(train_nodes)
+        valid_nodes = get_updated_nodes(valid_nodes)
+        test_nodes = get_updated_nodes(test_nodes)
+        # print(train_nodes.shape, valid_nodes.shape, test_nodes.shape)
 
         converter = TorchEdgeListConverter(
             output_dir=self.output_directory,
@@ -107,17 +128,17 @@ class OGBG_MOLHIV(GraphClassificationDataset):
 
         features = np.genfromtxt(self.input_node_feature_file, delimiter=",").astype(np.float32)
         labels = np.genfromtxt(self.input_graph_labels_file, delimiter=",").astype(np.int32)
-
+        # ipdb.set_trace()
         # extras 
         edge_features = np.genfromtxt(self.input_edge_feature_file, delimiter=",").astype(np.float32)
         num_edges = np.genfromtxt(self.input_num_edges_file, delimiter=",").astype(np.int32)
         num_nodes = np.genfromtxt(self.input_num_nodes_file, delimiter=",").astype(np.int32)
 
-        if remap_ids: # TODO: Add edge features
-            node_mapping = np.genfromtxt(self.output_directory / Path(PathConstants.node_mapping_path), delimiter=",")
-            train_nodes, valid_nodes, test_nodes, features, labels = remap_nodes(
-                node_mapping, train_nodes, valid_nodes, test_nodes, features, labels
-            )
+        # if remap_ids: # TODO: Add edge features
+        #     node_mapping = np.genfromtxt(self.output_directory / Path(PathConstants.node_mapping_path), delimiter=",")
+            # train_nodes, valid_nodes, test_nodes, features, labels = remap_nodes(
+            #     node_mapping, train_nodes, valid_nodes, test_nodes, features, labels
+            # )
 
         with open(self.train_nodes_file, "wb") as f:
             f.write(bytes(train_nodes))
@@ -142,6 +163,7 @@ class OGBG_MOLHIV(GraphClassificationDataset):
         dataset_stats.num_classes = 40
 
         dataset_stats.num_nodes = dataset_stats.num_train + dataset_stats.num_valid + dataset_stats.num_test
+        # dataset_stats.num_nodes = 1049163
 
         with open(self.output_directory / Path("dataset.yaml"), "w") as f:
             yaml_file = OmegaConf.to_yaml(dataset_stats)

@@ -11,8 +11,10 @@ CTestTestfile.cmake
 cmake-*/
 logs/
 data/
+datasets/
 test/test_data/generated/
 *.dylib
+temp/
 
 # Created by https://www.toptal.com/developers/gitignore/api/python
 # Edit at https://www.toptal.com/developers/gitignore?templates=python

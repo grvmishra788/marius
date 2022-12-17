@@ -1,12 +1,14 @@
 import argparse
 import shutil
 from pathlib import Path
-import ipdb
+# import ipdb
 import sys
 # sys.path is a list of absolute path strings
+sys.path.append('/marius/src/python/tools/preprocess/')
 sys.path.append('/marius/src/python/tools/preprocess/datasets/')
-# ipdb.set_trace()
-from marius.tools.preprocess import custom
+
+# ipdb.set_trace()  
+import custom
 import ogbg_molhiv
 from marius.tools.preprocess.datasets import (
     fb15k,
@@ -84,7 +86,7 @@ def set_args():
     parser.add_argument(
         "--no_remap_ids",
         action="store_true",
-        default=True,
+        default=False,
         help="If true, the node ids of the input dataset will not be remapped to random integer ids",
     )
 
