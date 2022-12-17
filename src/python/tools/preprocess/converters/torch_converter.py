@@ -185,6 +185,9 @@ def map_edge_lists(
             num_rels = torch.max(all_edges[:, 1])[0]
             unique_rels = torch.arange(num_rels).to(output_dtype)
 
+    num_nodes = 1049163
+    unique_nodes = torch.arange(num_nodes).to(output_dtype)
+
     if sequential_train_nodes or sequential_deg_nodes > 0:
         seq_nodes = None
 
@@ -255,25 +258,33 @@ def map_edge_lists(
             num_nodes - seq_nodes.shape[0], dtype=output_dtype
         )
     else:
-        mapped_node_ids = torch.randperm(num_nodes, dtype=output_dtype)
+        # mapped_node_ids = torch.randperm(num_nodes, dtype=output_dtype)
+        mapped_node_ids = []
+        num_nodes_g = np.genfromtxt("/marius/datasets/ogbg_molhiv/num-node-list.csv", delimiter=",").astype(np.int32)
+        # # num_nodes_g = num_nodes_g.iloc[:,0]
+        # # num_nodes_g = num_nodes_g.to_numpy()
+        graph_id = 0
+        for nodes in num_nodes_g:
+            for i in range(nodes):
+                mapped_node_ids.append(graph_id*1000+i)
+            graph_id += 1
+        mapped_node_ids = torch.tensor(mapped_node_ids, dtype=output_dtype)
 
     if has_rels:
         mapped_rel_ids = torch.randperm(num_rels, dtype=output_dtype)
 
     # TODO may use too much memory if the max id is very large
     # Needed to support indexing w/ the remap
-    if torch.max(unique_nodes) + 1 > num_nodes:
-        extended_map = torch.zeros(torch.max(unique_nodes) + 1, dtype=output_dtype)
-        extended_map[unique_nodes] = mapped_node_ids
-    else:
-        extended_map = mapped_node_ids
-
-    all_edges = None  # can safely free this tensor
+    # if torch.max(unique_nodes) + 1 > num_nodes:
+    #     extended_map = torch.zeros(torch.max(unique_nodes) + 1, dtype=output_dtype)
+    #     extended_map[unique_nodes] = mapped_node_ids
+    # else:
+    #     extended_map = mapped_node_ids
 
     output_edge_lists = []
     for edge_list in edge_lists:
-        new_src = extended_map[edge_list[:, 0].to(torch.int64)]
-        new_dst = extended_map[edge_list[:, -1].to(torch.int64)]
+        new_src = edge_list[:, 0].to(torch.int64)
+        new_dst = edge_list[:, -1].to(torch.int64)
 
         if has_rels:
             new_rel = mapped_rel_ids[edge_list[:, 1].to(torch.int64)]
