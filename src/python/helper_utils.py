@@ -45,3 +45,51 @@ def update_edges(file1,file2):
     updated_edges_df.to_csv(file1, index=False,  header=None)
     
     print(f'Updated edges successfully written to {file1}')
+
+def update_edges2(file1,file2):
+    # get mappings
+    print("Getting mappings")
+    mapped_node_ids = {}
+    num_nodes_g = np.genfromtxt("/marius/datasets/ogbg_molhiv/num-node-list.csv", delimiter=",").astype(np.int32)
+    # # num_nodes_g = num_nodes_g.iloc[:,0]
+    # # num_nodes_g = num_nodes_g.to_numpy()
+    graph_id = 0
+    cnt = 0
+    for nodes in num_nodes_g:
+        for i in range(nodes):
+            mapped_node_ids[graph_id*1000+i] = cnt
+            cnt += 1
+        graph_id += 1
+    
+    print("Updating edges")
+    # read the two files
+    edges = pd.read_csv(file1, header=None)
+    num_edges = pd.read_csv(file2, header=None)
+    
+    # create a list to store the updated edges
+    updated_edges = []
+    
+    offset = 0
+
+    # ipdb.set_trace()
+
+    # loop through the files
+    for i in range(len(num_edges)):
+        graph_id = i
+        num_edges_in_graph = num_edges.iloc[i,0]
+        for j in range(offset, offset + num_edges_in_graph):
+            node1 = edges.iloc[j,0]
+            node2 = edges.iloc[j,1]
+            updated_node1 = mapped_node_ids[graph_id * (1000) + node1]
+            updated_node2 = mapped_node_ids[graph_id * (1000) + node2]
+            updated_edge = [updated_node1, updated_node2]
+            updated_edges.append(updated_edge)
+        offset += num_edges_in_graph
+            
+    # convert the list to a dataframe
+    updated_edges_df = pd.DataFrame(updated_edges)
+    
+    # write the updated edges to a file
+    updated_edges_df.to_csv(file1, index=False,  header=None)
+    
+    print(f'Updated edges successfully written to {file1}')

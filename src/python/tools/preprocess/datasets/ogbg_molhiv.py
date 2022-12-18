@@ -87,11 +87,8 @@ class OGBG_MOLHIV(GraphClassificationDataset):
             for file in (self.output_directory / Path("hiv/split/scaffold")).iterdir():
                 file.rename(self.output_directory / Path(file.name))
 
-            update_edges(self.input_edge_list_file, self.input_num_edges_file)
+            update_edges2(self.input_edge_list_file, self.input_num_edges_file)
 
-    def preprocess(
-        self, num_partitions=1, remap_ids=True, splits=None, sequential_train_nodes=False, partitioned_eval=False
-    ):
 
         # replicate graph labels by number of nodes present in num-node-list.csv  & update graph-label.csv
         gl = np.genfromtxt(self.input_graph_labels_file, delimiter=",").astype(np.int32)
@@ -102,6 +99,9 @@ class OGBG_MOLHIV(GraphClassificationDataset):
             # print(gl.shape)
 
 
+    def preprocess(
+        self, num_partitions=1, remap_ids=True, splits=None, sequential_train_nodes=False, partitioned_eval=False
+    ):
         train_nodes = np.genfromtxt(self.input_train_nodes_file, delimiter=",").astype(np.int32)
         valid_nodes = np.genfromtxt(self.input_valid_nodes_file, delimiter=",").astype(np.int32)
         test_nodes = np.genfromtxt(self.input_test_nodes_file, delimiter=",").astype(np.int32)
@@ -128,6 +128,7 @@ class OGBG_MOLHIV(GraphClassificationDataset):
 
         features = np.genfromtxt(self.input_node_feature_file, delimiter=",").astype(np.float32)
         labels = np.genfromtxt(self.input_graph_labels_file, delimiter=",").astype(np.int32)
+        print(labels.shape)
         # ipdb.set_trace()
         # extras 
         edge_features = np.genfromtxt(self.input_edge_feature_file, delimiter=",").astype(np.float32)
